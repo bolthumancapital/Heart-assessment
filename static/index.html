@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Conversational H.E.A.R.T. Assessment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    .chat-window {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 15px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 20px;
+      max-width: 80%;
+    }
+    .bot { background: #f0f0f0; align-self: flex-start; }
+    .user { background: #d1e7dd; align-self: flex-end; }
+    .options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .option-btn {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      background: #e2e3e5;
+      font-size: 14px;
+    }
+    .option-btn:hover { background: #c8d0d5; }
+    #loading { display: none; margin-top: 10px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>Conversational H.E.A.R.T. Assessment</h1>
+  <div class="chat-window" id="chatWindow">
+    <!-- Chat bubbles will be injected here -->
+  </div>
+  <div id="loading">Calculating your H.E.A.R.T. scores…</div>
+
+  <script>
+    // ─── 1) The four questions & their emoji choices ────────────────────────
+    const questions = [
+      {
+        key: "work_feeling",
+        text: "Which emoji best captures how you feel about your work right now?",
+        options: [
+          "😀 Energized",
+          "🙂 Okay",
+          "😐 Meh",
+          "😓 Drained",
+          "😡 Frustrated"
+        ]
+      },
+      {
+        key: "team_feeling",
+        text: "Which emoji best captures how you feel about your team?",
+        options: [
+          "🤝 Supported",
+          "😔 Alone",
+          "👂 Heard",
+          "❌ Dismissed",
+          "🔒 Safe",
+          "🤨 Judged",
+          "🙌 Encouraged",
+          "💡 Valued"
+        ]
+      },
+      {
+        key: "leadership_feeling",
+        text: "Which emoji best captures how you feel about leadership?",
+        options: [
+          "🔊 Clear",
+          "🙁 Distant",
+          "🎯 Trustworthy",
+          "☁️ Unclear",
+          "✨ Inspiring",
+          "🤨 Rigid",
+          "😓 Micromanaging",
+          "🔒 Safe"
+        ]
+      },
+      {
+        key: "company_people_feeling",
+        text: "Which emoji best captures how you feel about people at your company?",
+        options: [
+          "🤗 Included",
+          "😒 Ignored",
+          "❤️ Connected",
+          "🤝 Respectful",
+          "🤔 Suspicious",
+          "🚪 Excluded",
+          "🔒 Safe",
+          "😓 Isolated"
+        ]
+      }
+    ];
+
+    // We’ll store each answer here:
+    const answers = {};
+
+    // Index of the question we are currently on:
+    let currentQuestionIndex = 0;
+
+    const chatWindow = document.getElementById("chatWindow");
+    const loadingIndicator = document.getElementById("loading");
+
+    // ─── Utility: Add a “bot” bubble with some text ──────────────────────────
+    function addBotBubble(text) {
+      const bubble = document.createElement("div");
+      bubble.className = "bubble bot";
+      bubble.innerText = text;
+      chatWindow.appendChild(bubble);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // ─── Utility: Add a “user” bubble with the chosen answer ─────────────────
+    function addUserBubble(text) {
+      const bubble = document.createElement("div");
+      bubble.className = "bubble user";
+      bubble.innerText = text;
+      chatWindow.appendChild(bubble);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // ─── Utility: Render the emoji‐options buttons for the current question ─
+    function renderOptions(options, questionKey) {
+      const container = document.createElement("div");
+      container.className = "options";
+
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => handleUserChoice(questionKey, opt);
+        container.appendChild(btn);
+      });
+
+      chatWindow.appendChild(container);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // ─── Handler when user picks one option ─────────────────────────────────
+    function handleUserChoice(questionKey, chosenText) {
+      // 1) Remove all existing option buttons (so user can’t click again)
+      document.querySelectorAll(".options").forEach(el => el.remove());
+
+      // 2) Show the user’s choice as a user‐bubble
+      addUserBubble(chosenText);
+
+      // 3) Store it
+      answers[questionKey] = chosenText;
+
+      // 4) Move to the next question after a short delay:
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        setTimeout(renderNextQuestion, 400);
+      } else {
+        // All four answered; now call the backend for H.E.A.R.T. scoring
+        setTimeout(callScoringAPI, 400);
+      }
+    }
+
+    // ─── Show the next question (bot bubble + options) ───────────────────────
+    function renderNextQuestion() {
+      const q = questions[currentQuestionIndex];
+      addBotBubble(q.text);
+      renderOptions(q.options, q.key);
+    }
+
+    // ─── Once all four are answered, send them to /score and show the result ─
+    async function callScoringAPI() {
+      // Show “loading…” line
+      loadingIndicator.style.display = "block";
+
+      try {
+        const resp = await fetch("/score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(answers)
+        });
+        const data = await resp.json();
+        loadingIndicator.style.display = "none";
+
+        if (resp.ok && data.heart_scores) {
+          addBotBubble("📊 Here are your H.E.A.R.T. scores:");
+          // Show the raw GPT reply inside a <pre> block
+          const pre = document.createElement("pre");
+          pre.style.background = "#f8f9fa";
+          pre.style.padding = "12px";
+          pre.style.borderRadius = "4px";
+          pre.style.whiteSpace = "pre-wrap";
+          pre.innerText = data.heart_scores;
+          chatWindow.appendChild(pre);
+        } else {
+          addBotBubble("⚠️ Sorry, something went wrong. Please try again later.");
+        }
+      } catch (err) {
+        loadingIndicator.style.display = "none";
+        addBotBubble("⚠️ Network or server error. Please refresh and try again.");
+        console.error(err);
+      }
+    }
+
+    // ─── Kick things off by rendering question #1 after page load ────────────
+    window.addEventListener("DOMContentLoaded", () => {
+      renderNextQuestion();
+    });
+  </script>
+</body>
+</html>
