@@ -1,48 +1,30 @@
-# app.py
+# app.py (slightly modified to accept JSON payload)
 
-import os
-import json
-import traceback
-
-from flask import Flask, request, render_template, redirect, url_for
+import os, traceback, json
+from flask import Flask, request, jsonify
 from openai import OpenAI
 
 app = Flask(__name__)
 
-# ─── 1) Load your OpenAI API key from an environment variable ────────────
 openai_api_key = os.getenv("OPENAI_API_KEY")
 if not openai_api_key:
     raise RuntimeError("Missing environment variable: OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
-
-# ───────────────────────────────────────────────────────────────────────────
-# ROUTE: GET “/”
-#   Serves the HTML form where employees pick four emoji-based responses
-# ───────────────────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def index():
-    """
-    Renders the questionnaire form (index.html).
-    """
-    return render_template("index.html")
+    # Serve our single-page “conversational” HTML
+    return app.send_static_file("index.html")
 
-
-# ───────────────────────────────────────────────────────────────────────────
-# ROUTE: POST “/score”
-#   Handles the form submission, calls OpenAI to get H.E.A.R.T. scores,
-#   then renders result.html with the scores.
-# ───────────────────────────────────────────────────────────────────────────
 @app.route("/score", methods=["POST"])
 def score():
     try:
-        # 1) Grab the four answers from the form submission
-        q1_answer = request.form.get("work_feeling", "").strip()
-        q2_answer = request.form.get("team_feeling", "").strip()
-        q3_answer = request.form.get("leadership_feeling", "").strip()
-        q4_answer = request.form.get("company_people_feeling", "").strip()
+        data = request.get_json() or {}
+        q1_answer = data.get("work_feeling", "").strip()
+        q2_answer = data.get("team_feeling", "").strip()
+        q3_answer = data.get("leadership_feeling", "").strip()
+        q4_answer = data.get("company_people_feeling", "").strip()
 
-        # 2) Build the prompt (H.E.A.R.T. framework)
         prompt = f"""
 You are an employee engagement expert. I will provide four emoji‐based responses from a single respondent:
   1) Work feeling:    "{q1_answer}"
@@ -67,7 +49,6 @@ Autonomy: <score>/10 – <brief sentence>
 Recognition: <score>/10 – <brief sentence>
 Trust: <score>/10 – <brief sentence>
 """
-        # 3) Call OpenAI’s chat endpoint (gpt-3.5-turbo)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -78,20 +59,13 @@ Trust: <score>/10 – <brief sentence>
                 {"role": "user", "content": prompt}
             ]
         )
-
-        # 4) Extract the GPT-generated text
         gpt_reply = response.choices[0].message.content.strip()
-
-        # 5) Pass that reply into result.html for rendering
-        return render_template("result.html", heart_scores=gpt_reply)
+        return jsonify({ "heart_scores": gpt_reply }), 200
 
     except Exception as e:
-        # If anything goes wrong, print the error and show a simple error page
         print("❌ SERVER ERROR:", e)
         traceback.print_exc()
-        return f"An error occurred: {e}", 500
-
+        return jsonify({ "error": str(e) }), 500
 
 if __name__ == "__main__":
-    # Locally, Flask listens on port 10000
     app.run(host="0.0.0.0", port=10000)
