@@ -1,1 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H.E.A.R.T. Assessment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    select {
+      width: 250px;
+      padding: 8px;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 1em;
+    }
+    #result {
+      margin-top: 30px;
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      padding: 16px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>H.E.A.R.T. Assessment</h1>
+  <form id="heartForm">
+    <div class="question">
+      <label for="q1">How does your work feel right now?</label>
+      <select id="q1" name="q1" required>
+        <option value="">-- pick one --</option>
+        <option value="😊 Energized">😊 Energized</option>
+        <option value="🙂 Okay">🙂 Okay</option>
+        <option value="🤔 Meh">🤔 Meh</option>
+        <option value="😓 Drained">😓 Drained</option>
+        <option value="😠 Frustrated">😠 Frustrated</option>
+      </select>
+    </div>
 
+    <div class="question">
+      <label for="q2">How do you feel about your team?</label>
+      <select id="q2" name="q2" required>
+        <option value="">-- pick one --</option>
+        <option value="🤝 Supported">🤝 Supported</option>
+        <option value="🙂 Alone">🙂 Alone</option>
+        <option value="👂 Heard">👂 Heard</option>
+        <option value="❌ Dismissed">❌ Dismissed</option>
+        <option value="🔒 Safe">🔒 Safe</option>
+      </select>
+    </div>
+
+    <div class="question">
+      <label for="q3">How do you feel about leadership?</label>
+      <select id="q3" name="q3" required>
+        <option value="">-- pick one --</option>
+        <option value="🔊 Clear">🔊 Clear</option>
+        <option value="😕 Distant">😕 Distant</option>
+        <option value="🎯 Trustworthy">🎯 Trustworthy</option>
+        <option value="❓ Unclear">❓ Unclear</option>
+        <option value="✨ Inspiring">✨ Inspiring</option>
+      </select>
+    </div>
+
+    <div class="question">
+      <label for="q4">Which emoji best captures how you feel about people at your company?</label>
+      <select id="q4" name="q4" required>
+        <option value="">-- pick one --</option>
+        <option value="🤗 Included">🤗 Included</option>
+        <option value="💔 Excluded">💔 Excluded</option>
+        <option value="😃 Welcomed">😃 Welcomed</option>
+        <option value="😐 Neutral">😐 Neutral</option>
+        <option value="😣 Uncomfortable">😣 Uncomfortable</option>
+      </select>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
