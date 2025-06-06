@@ -182,10 +182,10 @@
       loadingIndicator.style.display = "block";
 
       try {
-        const resp = await fetch("/score", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(answers)
+        const resp = await fetch("/formester-webhook", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(answers)
         });
         const data = await resp.json();
         loadingIndicator.style.display = "none";
