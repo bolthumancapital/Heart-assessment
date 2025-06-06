@@ -1,78 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>bolt. Conversational H.E.A.R.T. Assessment</title>
-
-  <!-- ─────────────── Brand‐Feel CSS ───────────────── -->
+  <meta charset="UTF-8"/>
+  <title>Conversational H.E.A.R.T. Assessment</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
   <style>
-    /* 1) Use a clean, modern sans‐serif. Later, you can replace "Helvetica Neue" with your exact bolt. brand font. */
-    @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;600&display=swap');
-
-    /* 2) Black page background to match bolt. dark theme */
     body {
-      background-color: #000; 
-      color: #fff; 
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
+      background-color: #000;        /* black background for “bolt.” brand */
+      color: #FFF;                   /* white text */
       margin: 0;
       padding: 0;
-    }
-
-    /* 3) Centered container with a little padding */
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    /* 4) Header with bolt logo and title */
-    header {
       display: flex;
-      align-items: center;
-      margin-bottom: 20px;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
     }
-    header img {
-      height: 48px;
-      margin-right: 12px;
-    }
-    header h1 {
-      font-size: 24px;
-      margin: 0;
-      color: #fff;
-    }
-
-    /* 5) Chat window background slightly lighter than pure black */
-    .chat-window {
-      background-color: #111; 
+    .container {
+      background: #111;              /* slightly off-black container */
       border-radius: 8px;
+      box-shadow: 0 0 16px rgba(0,0,0,0.4);
+      padding: 24px;
+      margin: 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #00AEEF;                /* bolt.-blue tagline color */
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 16px auto;
+      width: 120px;
+      height: auto;
+    }
+    .chat-window {
+      background: #222;              /* dark gray chat background */
+      border-radius: 6px;
       padding: 16px;
-      min-height: 360px;
+      min-height: 320px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       overflow-y: auto;
     }
-
-    /* 6) Chat bubbles */
     .bubble {
-      padding: 12px 16px;
+      padding: 10px 14px;
       border-radius: 20px;
       max-width: 80%;
+      font-size: 14px;
       line-height: 1.4;
-      word-break: break-word;
+      word-wrap: break-word;
     }
     .bot {
-      background: #1a1a1a;   /* very dark gray */
-      color: #e0e0e0;        /* light gray text */
+      background: #333;              /* darker bubble for bot */
       align-self: flex-start;
+      color: #EEE;
     }
     .user {
-      background: #007bff;   /* bolt blue */
-      color: #fff;
+      background: #005B9A;           /* bolt. navy-blue bubble for user */
       align-self: flex-end;
+      color: #FFF;
     }
-
-    /* 7) Emoji‐option buttons */
     .options {
       display: flex;
       flex-wrap: wrap;
@@ -80,63 +75,46 @@
       margin-top: 8px;
     }
     .option-btn {
-      background: #222;          /* dark button */
-      color: #fff;
-      border: 1px solid #333;
+      border: none;
+      padding: 8px 12px;
       border-radius: 20px;
-      padding: 8px 14px;
-      font-size: 14px;
       cursor: pointer;
-      transition: background 0.2s;
+      background: #005B9A;           /* bolt. navy-blue buttons */
+      color: #FFF;
+      font-size: 14px;
     }
     .option-btn:hover {
-      background: #007bff;       /* on hover, switch to bolt blue */
-      border-color: #0056b3;
+      background: #00AEEF;           /* bolt. bright-blue hover */
     }
-
-    /* 8) Loading indicator text */
     #loading {
       display: none;
-      margin-top: 12px;
+      margin-top: 10px;
       font-style: italic;
-      color: #ccc;
-    }
-
-    /* 9) Pre block for showing the raw H.E.A.R.T. response */
-    pre {
-      background: #222;
-      color: #e0e0e0;
-      padding: 12px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-      margin-top: 12px;
-      overflow-x: auto;
+      color: #BBB;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <!-- ─── Header: bolt logo + title ──────────────────────────── -->
-    <header>
-      <!-- Ensure this path matches where you stored your logo under static/images/ -->
-      <img src="/static/images/bolt_logo_white.png" alt="bolt. logo" />
-      <h1>bolt. H.E.A.R.T. Assessment</h1>
-    </header>
+    <!-- 1) The brand logo at the top -->
+    <img
+      src="/static/images/bolt_logo_white.png"
+      alt="bolt. logo"
+      class="logo"
+    />
 
-    <!-- ─── Chat Window ────────────────────────────────────────── -->
+    <h1>Conversational H.E.A.R.T. Assessment</h1>
+
+    <!-- 2) Chat window -->
     <div class="chat-window" id="chatWindow">
-      <!-- bubbles will be injected here by JavaScript -->
+      <!-- Chat bubbles will be injected here -->
     </div>
-
-    <!-- ─── Loading Indicator ──────────────────────────────────── -->
     <div id="loading">Calculating your H.E.A.R.T. scores…</div>
   </div>
 
-  <!-- ──────────────────────────────────────────────────────────────────────────── -->
-  <!-- ─── Conversational JavaScript ───────────────────────────────────────────── -->
   <script>
-    // 1) Define the four questions and their emoji‐options
+    // ─── 1) The four questions & their emoji choices ────────────────────────
     const questions = [
       {
         key: "work_feeling",
@@ -193,17 +171,16 @@
       }
     ];
 
-    // 2) An object to hold the user’s answers
+    // We’ll store each answer here:
     const answers = {};
 
-    // 3) Track which question we’re on
+    // Index of the question we are currently on:
     let currentQuestionIndex = 0;
 
-    // 4) Grab references to our DOM nodes
-    const chatWindow      = document.getElementById("chatWindow");
+    const chatWindow = document.getElementById("chatWindow");
     const loadingIndicator = document.getElementById("loading");
 
-    // ─── Utility: Add a “bot” chat bubble ───────────────────────────────────
+    // ─── Utility: Add a “bot” bubble with some text ──────────────────────────
     function addBotBubble(text) {
       const bubble = document.createElement("div");
       bubble.className = "bubble bot";
@@ -212,7 +189,7 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // ─── Utility: Add a “user” chat bubble ──────────────────────────────────
+    // ─── Utility: Add a “user” bubble with the chosen answer ─────────────────
     function addUserBubble(text) {
       const bubble = document.createElement("div");
       bubble.className = "bubble user";
@@ -221,10 +198,11 @@
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // ─── Utility: Render option buttons under a chat bubble ──────────────────
+    // ─── Utility: Render the emoji‐options buttons for the current question ─
     function renderOptions(options, questionKey) {
       const container = document.createElement("div");
       container.className = "options";
+
       options.forEach(opt => {
         const btn = document.createElement("button");
         btn.type = "button";
@@ -233,56 +211,66 @@
         btn.onclick = () => handleUserChoice(questionKey, opt);
         container.appendChild(btn);
       });
+
       chatWindow.appendChild(container);
       chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // ─── Handler: User picks an emoji option ────────────────────────────────
+    // ─── Handler when user picks one option ─────────────────────────────────
     function handleUserChoice(questionKey, chosenText) {
-      // 1) Remove any existing option‐buttons so they can’t be clicked again
+      // 1) Remove all existing option buttons (so user can’t click again)
       document.querySelectorAll(".options").forEach(el => el.remove());
-      // 2) Show the selected choice as a “user” bubble
+
+      // 2) Show the user’s choice as a user‐bubble
       addUserBubble(chosenText);
-      // 3) Save the answer
+
+      // 3) Store it
       answers[questionKey] = chosenText;
-      // 4) Move to next question (or finish)
+
+      // 4) Move to the next question after a short delay:
       currentQuestionIndex++;
       if (currentQuestionIndex < questions.length) {
         setTimeout(renderNextQuestion, 400);
       } else {
-        // All questions answered → call backend
+        // All four answered; now call the backend for H.E.A.R.T. scoring
         setTimeout(callScoringAPI, 400);
       }
     }
 
-    // ─── Show the next question’s text and options ──────────────────────────
+    // ─── Show the next question (bot bubble + options) ───────────────────────
     function renderNextQuestion() {
       const q = questions[currentQuestionIndex];
       addBotBubble(q.text);
       renderOptions(q.options, q.key);
     }
 
-    // ─── After answering all four, send them to /formester-webhook ─────────
+    // ─── Once all four are answered, send them to /formester-webhook and show the result ─
     async function callScoringAPI() {
-      loadingIndicator.style.display = "block";  // show loading…
+      // Show “loading…” line
+      loadingIndicator.style.display = "block";
+
       try {
- - const resp = await fetch("/score", {
- + const resp = await fetch("/formester-webhook", {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify(answers)
-  });
+        const resp = await fetch("/formester-webhook", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(answers)
         });
         const data = await resp.json();
-        loadingIndicator.style.display = "none"; // hide loading
+        loadingIndicator.style.display = "none";
 
-        if (resp.ok && data.response) {
-          // 1) Show a heading bubble
+        if (resp.ok && data.heart_scores) {
           addBotBubble("📊 Here are your H.E.A.R.T. scores:");
-          // 2) Create a <pre> block to show the raw GPT reply
+          // Show the raw GPT reply inside a <pre> block
           const pre = document.createElement("pre");
-          pre.innerText = data.response;
+          pre.style.background = "#333";
+          pre.style.color = "#FFF";
+          pre.style.padding = "12px";
+          pre.style.borderRadius = "4px";
+          pre.style.whiteSpace = "pre-wrap";
+          pre.style.fontSize = "13px";
+          pre.innerText = data.heart_scores;
           chatWindow.appendChild(pre);
+          chatWindow.scrollTop = chatWindow.scrollHeight;
         } else {
           addBotBubble("⚠️ Sorry, something went wrong. Please try again later.");
         }
@@ -293,7 +281,7 @@
       }
     }
 
-    // ─── Kick things off once the page finishes loading ────────────────────
+    // ─── Kick things off by rendering question #1 after page load ────────────
     window.addEventListener("DOMContentLoaded", () => {
       renderNextQuestion();
     });
