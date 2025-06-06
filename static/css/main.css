@@ -1,1 +1,129 @@
+/* static/css/main.css */
 
+/* ─── 1) Import Google Fonts (Roboto & Archivo Black as proxy for League Gothic) ───────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto:wght@400;500&display=swap");
+
+/* ─── 2) Root brand colors from BH C Guidelines ───────────────────────────────────────── */
+:root {
+  --bolt-blue-1: #0097ee;
+  --bolt-blue-2: #00a8e0;
+  --bolt-teal:    #5de0e6;   /* (not used heavily, but available) */
+  --bolt-navy:    #004aad;
+  --bolt-dark:    #151f27;   /* almost black – for page background */
+  --bolt-light:   #eff3f6;
+  --bolt-white:   #ffffff;
+}
+
+/* ─── 3) Base resets & body background ────────────────────────────────────────── */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bolt-dark);
+  color: var(--bolt-light);
+  font-family: "Roboto", sans-serif;
+}
+
+/* ─── 4) Container to center content ────────────────────────────────────────── */
+#content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ─── 5) Header styles ────────────────────────────────────────────────────── */
+h1 {
+  font-family: "Archivo Black", sans-serif; /* proxy for League Gothic / headers */
+  font--size: 28px;
+  margin: 0 0 20px 0;
+  color: var(--bolt-blue-1);
+  text-align: center;
+}
+
+/* ─── 6) Chat window panel ─────────────────────────────────────────────────── */
+.chat-window {
+  background: #1f2430; /* Slightly lighter dark than #151f27 */
+  border: 2px solid var(--bolt-navy);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+/* ─── 7) Chat bubbles ──────────────────────────────────────────────────────── */
+.bubble {
+  padding: 12px 16px;
+  border-radius: 20px;
+  max-width: 80%;
+  line-height: 1.4;
+  font-size: 15px;
+}
+.bubble.bot {
+  background: #2a2e3b;            /* very dark gray for bot */
+  color: var(--bolt-light);
+  align-self: flex-start;
+  border-left: 4px solid var(--bolt-blue-1);
+}
+.bubble.user {
+  background: var(--bolt-blue-2);  /* light electric blue for user */
+  color: var(--bolt-dark);
+  align-self: flex-end;
+  border-right: 4px solid var(--bolt-navy);
+}
+
+/* ─── 8) Option buttons (emoji choices) ───────────────────────────────────── */
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.option-btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  background: var(--bolt-light);        /* white-ish */
+  color: var(--bolt-navy);
+  font-size: 14px;
+  font-family: "Roboto", sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.option-btn:hover {
+  background: var(--bolt-blue-1);
+  color: var(--bolt-white);
+}
+
+/* ─── 9) Loading indicator ───────────────────────────────────────────────── */
+#loading {
+  display: none;
+  margin: 12px 0;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--bolt-blue-2);
+}
+
+/* ─── 10) Preformatted box for showing scores ────────────────────────────── */
+pre {
+  background: #2a2e3b;
+  color: var(--bolt-light);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  overflow-x: auto;
+}
+
+/* ─── 11) Scrollbar styling (optional, for WebKit) ───────────────────────── */
+.chat-window::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-window::-webkit-scrollbar-track {
+  background: #1f2430;
+}
+.chat-window::-webkit-scrollbar-thumb {
+  background: var(--bolt-blue-1);
+  border-radius: 4px;
+}
