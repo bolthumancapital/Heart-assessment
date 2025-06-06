@@ -266,10 +266,12 @@
     async function callScoringAPI() {
       loadingIndicator.style.display = "block";  // show loading…
       try {
-        const resp = await fetch("/formester-webhook", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(answers)
+ - const resp = await fetch("/score", {
+ + const resp = await fetch("/formester-webhook", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify(answers)
+  });
         });
         const data = await resp.json();
         loadingIndicator.style.display = "none"; // hide loading
