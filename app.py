@@ -2,7 +2,7 @@ import os
 import json
 import traceback
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from openai import OpenAI
 
 app = Flask(__name__)
@@ -12,14 +12,18 @@ if not openai_api_key:
     raise RuntimeError("Missing environment variable: OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
-
 @app.route("/", methods=["GET"])
 def index():
     return "👋 Koonman Formester Webhook is LIVE!"
 
+@app.route("/assessment", methods=["GET"])
+def serve_assessment():
+    return render_template("assessment.html")
 
 @app.route("/formester-webhook", methods=["POST"])
 def formester_webhook():
+    # …the rest of your existing code…
+
     try:
         # 1) Log the full incoming payload
         incoming = request.json
