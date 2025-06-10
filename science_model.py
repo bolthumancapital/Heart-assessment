@@ -76,16 +76,31 @@ def preprocess_raw_responses(raw: list) -> pd.DataFrame:
     return pd.DataFrame(records)
 
 def compute_ctt_indices(df: pd.DataFrame, items: list) -> dict:
+    """
+    Compute Cronbach's alpha and item statistics for given items,
+    but guard against zero total variance (e.g. only one response).
+    """
     sub = df[items]
     total = sub.sum(axis=1)
     var_items = sub.var(ddof=1)
     var_total = total.var(ddof=1)
-    n = len(items)
-    alpha = (n/(n-1))*(1 - var_items.sum()/var_total)
-    itc = {it: sub[it].corr(total) for it in items}
-    return {'alpha': alpha, 'item_total_corr': itc,
-            'item_means': sub.mean().to_dict(),
-            'item_vars': var_items.to_dict()}
+
+    # Safeguard: if total variance is zero or not enough respondents, skip alpha
+    if var_total == 0 or len(df) < 2:
+        alpha = None
+        item_total_corr = {item: None for item in items}
+    else:
+        n = len(items)
+        alpha = (n / (n - 1)) * (1 - var_items.sum() / var_total)
+        item_total_corr = {item: sub[item].corr(total) for item in items}
+
+    return {
+        'alpha': alpha,
+        'item_total_corr': item_total_corr,
+        'item_means': sub.mean().to_dict(),
+        'item_vars': var_items.to_dict()
+    }
+
 
 def run_ctt_analysis_from_raw(raw: list) -> dict:
     df = preprocess_raw_responses(raw)
