@@ -86,14 +86,28 @@ function renderNextQuestion() {
 // ─── After all answered, call webhook ───────────────────────────────
 async function callScoringAPI() {
   loadingIndicator.style.display = "block";
+
   try {
+    // Build payload with the first four SPARK answers under the legacy keys:
+    const payload = {
+      work_feeling:           answers["1"],   // SPARK question 1
+      team_feeling:           answers["2"],   // SPARK question 2
+      leadership_feeling:     answers["3"],   // SPARK question 3
+      company_people_feeling: answers["4"],   // SPARK question 4
+      responses: [answers]                   // all 15 for CTT
+    };
+
     const resp = await fetch("/formester-webhook", {
-      method: "POST",
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ responses: [answers] })
+      body:    JSON.stringify(payload)
     });
+
     const data = await resp.json();
     loadingIndicator.style.display = "none";
+
+    // … rest of your success / error handling …
+
 
     if (resp.ok) {
       // show H.E.A.R.T.
