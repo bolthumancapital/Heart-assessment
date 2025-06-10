@@ -1,7 +1,5 @@
 # app.py
 
-import io
-import sys
 import os
 import json
 import traceback
@@ -9,21 +7,16 @@ from flask import Flask, request, jsonify, send_from_directory
 from openai import OpenAI
 from science_model import run_ctt_analysis_from_raw
 
-# ─── Force UTF-8 I/O ───────────────────────────────────────────
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
-# ───────────────────────────────────────────────────────────────
-
 app = Flask(__name__)
 
-# ─── Initialize OpenAI client ────────────────────────────────────────────
+# --- Initialize OpenAI client ------------------------
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
     raise RuntimeError("Missing environment variable: OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
-# ────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------
 
-# ─── Serve static UI ───────────────────────────────────────────────────────
+# --- Serve static UI -------------------------------
 @app.route("/", methods=["GET"])
 def serve_index():
     return send_from_directory(
@@ -31,32 +24,27 @@ def serve_index():
         path="index.html"
     )
 
-# ─── Webhook: H.E.A.R.T. + CTT combo ────────────────────────────────────────
+# --- Webhook: H.E.A.R.T. + CTT combo -----------------
 @app.route("/formester-webhook", methods=["POST"])
 def formester_webhook():
     try:
         incoming = request.get_json(force=True)
-        print(
-            "➡️ Incoming payload:",
-            json.dumps(incoming, indent=2, ensure_ascii=False),
-            flush=True
-        )
 
         # 1) H.E.A.R.T. inputs
-        work_ans   = incoming.get("work_feeling", "").strip()
-        team_ans   = incoming.get("team_feeling", "").strip()
-        lead_ans   = incoming.get("leadership_feeling", "").strip()
-        ppl_ans    = incoming.get("company_people_feeling", "").strip()
+        work_ans   = incoming.get("work_feeling", "")
+        team_ans   = incoming.get("team_feeling", "")
+        lead_ans   = incoming.get("leadership_feeling", "")
+        ppl_ans    = incoming.get("company_people_feeling", "")
 
         # 2) Build GPT prompt
         prompt = (
             f"You are an employee engagement expert. I will provide four emoji-based responses:\n"
-            f"1) Work feeling:    \"{work_ans}\"\n"
-            f"2) Team feeling:    \"{team_ans}\"\n"
-            f"3) Leadership:      \"{lead_ans}\"\n"
-            f"4) Company people:  \"{ppl_ans}\"\n\n"
+            f"1) Work:    \"{work_ans}\"\n"
+            f"2) Team:    \"{team_ans}\"\n"
+            f"3) Lead:    \"{lead_ans}\"\n"
+            f"4) People:  \"{ppl_ans}\"\n\n"
             "Using the H.E.A.R.T. framework (Happiness, Engagement, Autonomy, Recognition, Trust), please:\n"
-            "  • Give a numeric score (0–10) for each category\n"
+            "  • Give a numeric score (0-10) for each category\n"
             "  • Provide a one-sentence rationale for each.\n\n"
             "Format exactly as:\n"
             "Happiness: <score>/10 - <sentence>\n"
@@ -65,9 +53,8 @@ def formester_webhook():
             "Recognition: <score>/10 - <sentence>\n"
             "Trust: <score>/10 - <sentence>"
         )
-        print("✏️ Prompt to GPT:\n", prompt, flush=True)
 
-        # 3) Call GPT for H.E.A.R.T. scores
+        # 3) Call GPT for H.E.A.R.T.
         resp = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -76,32 +63,27 @@ def formester_webhook():
             ]
         )
         heart_scores = resp.choices[0].message.content.strip()
-        print("✅ GPT reply:\n", heart_scores, flush=True)
 
-        # 4) CTT analysis on SPARK responses
+        # 4) Run CTT analysis on SPARK responses
         raw = incoming.get("responses", [])
         science_ctt = run_ctt_analysis_from_raw(raw)
-        print(
-            "🔬 CTT results:\n",
-            json.dumps(science_ctt, indent=2, ensure_ascii=False),
-            flush=True
-        )
 
-        # 5) Return combined JSON
+        # 5) Return combined results
         return jsonify({
             "heart_scores": heart_scores,
             "science_ctt":  science_ctt
         }), 200
 
     except Exception as e:
-        print("❌ SERVER ERROR:", e, flush=True)
+        # Log full traceback to server logs
         traceback.print_exc()
+        # Return error details (no printing to console)
         return jsonify({
             "error":   "Server error",
             "details": str(e)
         }), 500
 
-# ─── Main entry ─────────────────────────────────────────────────────────────
+# --- Main entry -------------------------------------
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=True)
