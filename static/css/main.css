@@ -127,3 +127,19 @@ pre {
   background: var(--bolt-blue-1);
   border-radius: 4px;
 }
+/* ─── Container and Logo sizing ───────────────────────────────────────── */
+.container {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #111;               /* match your brand container color */
+  border-radius: 8px;
+  box-shadow: 0 0 16px rgba(0,0,0,0.4);
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 16px;
+  width: 120px;
+  height: auto;
+}
